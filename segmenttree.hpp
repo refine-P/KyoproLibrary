@@ -47,9 +47,21 @@ struct SegmentTree {
     T query(int a, int b) {
         return query(a, b, 0, 0, n);
     }
+
+    //非再帰版: バグってるかもしれないので定数倍高速化する時以外使わないで
+    //区間[a, b)に対するクエリに答える
+    T query_fast(int a, int b) {
+        T vl = INITIAL_VALUE, vr = INITIAL_VALUE;
+        for (int l = a + n, r = b + n; l != r; l >>= 1, r >>= 1) {
+            if (l & 1) vl = merge(vl, data[l++ - 1]);
+            if (r & 1) vr = merge(data[--r - 1], vr);
+        }
+        return merge(vl, vr);
+    }
 };
 
 //使うときは以下2つを変更
+//非可換の場合は順序に注意！！！
 template <typename T>
 T SegmentTree<T>::merge(T x, T y) {
     return min(x, y);

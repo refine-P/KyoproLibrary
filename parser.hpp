@@ -1,5 +1,6 @@
 struct Parser {
     using State = string::const_iterator;
+    using Result = int;
     class ParseError {};
 
     string s;
@@ -23,7 +24,12 @@ struct Parser {
         }
     }
 
-    int run() {
+    Result run() {
+        State begin = s.begin();
+        return expr(begin);
+    }
+
+    Result expr(State& begin) {
 
     }
 };
