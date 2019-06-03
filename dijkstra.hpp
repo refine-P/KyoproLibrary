@@ -11,9 +11,9 @@ struct State {
 };
 
 struct Edge {
-  int to;
-  int cost;  
-  Edge(int to, int cost) : to(to), cost(cost) {}  
+    int to;
+    int cost;  
+    Edge(int to, int cost) : to(to), cost(cost) {}  
 };
 
 typedef vector<vector<Edge> > AdjList; //隣接リスト
