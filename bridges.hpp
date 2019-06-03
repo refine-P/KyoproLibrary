@@ -19,7 +19,6 @@ void dfs(int cur, int par, int& t) {
     }
 }
 
-// ?
 void bridges(int v) {
     ord.resize(v, 0);
     low.resize(v);
