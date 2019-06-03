@@ -20,7 +20,6 @@ void dfs(int cur, int par, int& t) {
     if (par == -1 && cnt > 1) is_art[cur] = true;
 }
 
-// 関節点
 void articulationPoints(int v) {
     ord.resize(v, 0);
     low.resize(v);
