@@ -1,3 +1,9 @@
-int gcd(int a, int b) {
-    return b ? gcd(b, a%b) : a;
+template<typename T>
+T gcd(T a, T b) {
+    while (b) {
+        T tmp = b;
+        b = a % b;
+        a = tmp;
+    }
+    return a;
 }
