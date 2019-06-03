@@ -20,12 +20,33 @@ struct LazySegmentTree {
         lazy.resize(2 * n - 1, INITIAL_LAZY_VALUE);
     }
 
+    void init(const vector<T>& v, T initial_data_value, T initial_lazy_value) {
+        int size = v.size();
+        n = 1;
+        INITIAL_DATA_VALUE = initial_data_value;
+        INITIAL_LAZY_VALUE = initial_lazy_value;
+        while (n < size) n *= 2;
+        data.resize(2 * n - 1, INITIAL_DATA_VALUE);
+        lazy.resize(2 * n - 1, INITIAL_LAZY_VALUE);
+
+        for (int i = 0; i < size; i++) data[i + n - 1] = v[i];
+        for (int i = n - 2; i >= 0; i--) data[i] = merge(data[i * 2 + 1], data[i * 2 + 2]);
+    }
+
     LazySegmentTree(int size, T initial_data_value, T initial_lazy_value) {
         init(size, initial_data_value, initial_lazy_value);
     }
 
     LazySegmentTree(int size, T initial_value) {
         init(size, initial_value, initial_value);
+    }
+
+    LazySegmentTree(const vector<T>& v, T initial_data_value, T initial_lazy_value) {
+        init(v, initial_data_value, initial_lazy_value);
+    }
+
+    LazySegmentTree(const vector<T>& v, T initial_value) {
+        init(v, initial_value, initial_value);
     }
 
     T getLeaf(int k) {

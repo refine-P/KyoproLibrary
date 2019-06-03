@@ -15,6 +15,17 @@ struct SegmentTree {
         data.resize(2 * n - 1, INITIAL_VALUE);
     }
 
+    SegmentTree(const vector<T>& v, T initial_value) {
+        int size = v.size();
+        n = 1;
+        INITIAL_VALUE = initial_value;
+        while (n < size) n *= 2;
+        data.resize(2 * n - 1, INITIAL_VALUE);
+
+        for (int i = 0; i < size; i++) data[i + n - 1] = v[i];
+        for (int i = n - 2; i >= 0; i--) data[i] = merge(data[i * 2 + 1], data[i * 2 + 2]);
+    }
+
     T getLeaf(int k) {
         return data[k + n - 1];
     }
