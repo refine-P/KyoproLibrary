@@ -1,5 +1,5 @@
-typedef vector<int> vec;
-typedef vector<vec> mat;
+using vec = vector<ll>;
+using mat = vector<vec>;
 
 mat mul(mat& A, mat& B) {
 	mat C(A.size(), vec(B[0].size(), 0));
@@ -13,7 +13,7 @@ mat mul(mat& A, mat& B) {
 	return C;
 }
 
-mat pow(mat A, int n) {
+mat pow(mat A, ll n) {
 	mat B(A.size(), vec(A.size(), 0));
 	for (int i = 0; i < A.size(); i++) {
 		B[i][i] = 1;
