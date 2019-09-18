@@ -53,7 +53,7 @@ struct LazySegmentTree {
         return data[k + n - 1];
     }
 
-    void eval(int k, int l, int r) {
+    void push(int k, int l, int r) {
         if (lazy[k] == INITIAL_LAZY_VALUE) return;
         apply(k, r - l);
         if (r - l > 1) {
@@ -66,13 +66,13 @@ struct LazySegmentTree {
     //区間[a, b)に対する更新
     //k:節点番号, [l, r):節点に対応する区間
     void update(int a, int b, T x, int k, int l, int r) {
-        eval(k, l, r);
+        push(k, l, r);
         //[a, b)と[l, r)が交差しない場合
         if (r <= a || b <= l) return;
         //[a, b)が[l, r)を含む場合、節点の値
         if (a <= l && r <= b) {
             updateNode(k, x);
-            eval(k, l, r);
+            push(k, l, r);
         } else {
             update(a, b, x, k * 2 + 1, l, (l + r) / 2);
             update(a, b, x, k * 2 + 2, (l + r) / 2, r);
@@ -87,7 +87,7 @@ struct LazySegmentTree {
     //区間[a, b)に対するクエリに答える
     //k:節点番号, [l, r):節点に対応する区間
     T query(int a, int b, int k, int l, int r) {
-        eval(k, l, r);
+        push(k, l, r);
         //[a, b)と[l, r)が交差しない場合
         if (r <= a || b <= l) return INITIAL_DATA_VALUE;
         //[a, b)が[l, r)を含む場合、節点の値
