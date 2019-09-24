@@ -4,7 +4,7 @@
 //     121412321
 // ※普通にやると奇数長の回文しか検出できないが、
 //   "a$b$a$a$b"のようにダミー文字を挟むと偶数長の回文も検出可能
-vector<int> manachar(const string& S) {
+vector<int> manacher(const string& S) {
     vector<int> res(S.size());
     int i = 0, j = 0;
     while (i < S.size()) {
