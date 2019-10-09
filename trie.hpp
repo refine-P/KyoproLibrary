@@ -1,8 +1,6 @@
-const int NONE = -1;
-
+template<const int CHAR_NUM = 26, const char FIRST_CHAR = 'a'>
 struct Trie {
-    const static int CHAR_NUM = 26;
-    const static char FIRST_CHAR = 'a';
+    static const int NONE;
 
     struct Node {
         bool leaf;
@@ -36,9 +34,25 @@ struct Trie {
         for (char c : s) {
             if (tree[cur].idxs[c - FIRST_CHAR] == NONE) {
                 return false;
-            } 
-            cur = tree[cur].idxs[c - FIRST_CHAR];           
+            }
+            cur = tree[cur].idxs[c - FIRST_CHAR];
         }
         return tree[cur].leaf;
     }
+
+    int dfs(int cur, int K) {
+        int res = K + 1;
+        for (int i = 0; i < CHAR_NUM; i++) {
+            if (tree[cur].idxs[i] == NONE) continue;
+            int hoge = dfs(tree[cur].idxs[i], K);
+            if (hoge >= K) continue;
+            res = min(res, hoge + 1);
+        }
+        if (res > K) res = 0;
+        return res;
+    }
 };
+
+// 定数の定義はこう書かないとなぜかエラーが出る
+template<const int CHAR_NUM, const char FIRST_CHAR>
+const int Trie<CHAR_NUM, FIRST_CHAR>::NONE = -1;
