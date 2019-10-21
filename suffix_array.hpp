@@ -58,9 +58,14 @@ struct SuffixArray {
         return ok;
     }
 
+    // 文字列sが文字列strに含まれるならSAのindexを、無いなら-1を返す
+    int find(const string& s) {
+        int idx = lower_bound(s);
+        return ((idx < sa.size() && str.compare(sa[idx], s.size(), s) == 0) ? idx : -1);
+    }
+
     // 文字列sが文字列strに含まれるか？
     bool contain(const string& s) {
-        int idx = lower_bound(s);
-        return idx < sa.size() && str.compare(sa[idx], s.size(), s) == 0;
+        return find(s) != -1;
     }
 };
