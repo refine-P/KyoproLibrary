@@ -1,12 +1,10 @@
-template <typename T>
+template <class SemiLattice>
 struct SparseTable {
+    using T = typename SemiLattice::T;
+
     int n;
     vector< vector<T> > table;
     vector<int> log_table;
-
-    //使うときは、この2つを適宜変更する
-    static T merge(T x, T y);
-    static T INITIAL_VALUE;
 
     SparseTable(const vector<T>& v) {
         n = v.size();
@@ -24,27 +22,22 @@ struct SparseTable {
         size_t sz = table.size();
         for (int i = 1; i < sz; i++) {
             for (int j = 0; j + (1 << i) <= n; j++) {
-                table[i][j] = merge(table[i - 1][j], table[i - 1][j + (1 << (i - 1))]);
+                table[i][j] = SemiLattice::merge(table[i - 1][j], table[i - 1][j + (1 << (i - 1))]);
             }
         }
     }
 
     //区間[l, r)に対するクエリに答える
     T query(int l, int r) {
-        if (l == r) return INITIAL_VALUE;
+        assert(l < r); 
         int k = log_table[r - l];
-        return merge(table[k][l], table[k][r - (1 << k)]);
+        return SemiLattice::merge(table[k][l], table[k][r - (1 << k)]);
     }
 };
 
-//使うときは以下2つを変更
-//非可換の場合は順序に注意！！！
-template <typename T>
-T SparseTable<T>::merge(T x, T y) {
-    return max(x, y);
-}
-
-//本来は必要無いはずだけど、区間幅0のときにバグるので一応単位元を用意
-//(区間幅0のときは例外処理した方が良い？)
-template <typename T>
-T SparseTable<T>::INITIAL_VALUE = 0;
+//以下、SemiLatticeの例
+template <class U = ll>
+struct RMQSL {
+    using T = U;
+    static T merge(T a, T b) { return max(a, b); }
+};
