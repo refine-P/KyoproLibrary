@@ -1,29 +1,24 @@
-template <typename T>
+template <class Monoid>
 struct SegmentTree {
+    using T = typename Monoid::T;
+
     int n;
     vector<T> data;
-    T INITIAL_VALUE;
 
-    //使うときは、この2つを適宜変更する
-    static T merge(T x, T y);
-    void updateNode(int k, T x);
-
-    SegmentTree(int size, T initial_value) {
+    SegmentTree(int size, T initial_value = Monoid::identity()) {
         n = 1;
-        INITIAL_VALUE = initial_value;
         while (n < size) n *= 2;
-        data.resize(2 * n - 1, INITIAL_VALUE);
+        data.resize(2 * n - 1, initial_value);
     }
 
-    SegmentTree(const vector<T>& v, T initial_value) {
+    SegmentTree(const vector<T>& v, T initial_value = Monoid::identity()) {
         int size = v.size();
         n = 1;
-        INITIAL_VALUE = initial_value;
         while (n < size) n *= 2;
-        data.resize(2 * n - 1, INITIAL_VALUE);
+        data.resize(2 * n - 1, initial_value);
 
         for (int i = 0; i < size; i++) data[i + n - 1] = v[i];
-        for (int i = n - 2; i >= 0; i--) data[i] = merge(data[i * 2 + 1], data[i * 2 + 2]);
+        for (int i = n - 2; i >= 0; i--) data[i] = Monoid::merge(data[i * 2 + 1], data[i * 2 + 2]);
     }
 
     T getLeaf(int k) {
@@ -32,10 +27,10 @@ struct SegmentTree {
 
     void update(int k, T x) {
         k += n - 1; //葉の節点
-        updateNode(k, x);
+        Monoid::update(data[k], x);
         while (k > 0) {
             k = (k - 1) / 2;
-            data[k] = merge(data[k * 2 + 1], data[k * 2 + 2]);
+            data[k] = Monoid::merge(data[k * 2 + 1], data[k * 2 + 2]);
         }
     }
 
@@ -43,14 +38,14 @@ struct SegmentTree {
     //k:節点番号, [l, r):節点に対応する区間
     T query(int a, int b, int k, int l, int r) {
         //[a, b)と[l, r)が交差しない場合
-        if (r <= a || b <= l) return INITIAL_VALUE;
+        if (r <= a || b <= l) return Monoid::identity();
         //[a, b)が[l, r)を含む場合、節点の値
         if (a <= l && r <= b) return data[k];
         else {
             //二つの子をマージ
             T vl = query(a, b, k * 2 + 1, l, (l + r) / 2);
             T vr = query(a, b, k * 2 + 2, (l + r) / 2, r);
-            return merge(vl, vr);
+            return Monoid::merge(vl, vr);
         }
     }
 
@@ -62,23 +57,28 @@ struct SegmentTree {
     //非再帰版: バグってるかもしれないので定数倍高速化する時以外使わないで
     //区間[a, b)に対するクエリに答える
     T query_fast(int a, int b) {
-        T vl = INITIAL_VALUE, vr = INITIAL_VALUE;
+        T vl = Monoid::identity(), vr = Monoid::identity();
         for (int l = a + n, r = b + n; l != r; l >>= 1, r >>= 1) {
-            if (l & 1) vl = merge(vl, data[l++ - 1]);
-            if (r & 1) vr = merge(data[--r - 1], vr);
+            if (l & 1) vl = Monoid::merge(vl, data[l++ - 1]);
+            if (r & 1) vr = Monoid::merge(data[--r - 1], vr);
         }
-        return merge(vl, vr);
+        return Monoid::merge(vl, vr);
     }
 };
 
-//使うときは以下2つを変更
-//非可換の場合は順序に注意！！！
-template <typename T>
-T SegmentTree<T>::merge(T x, T y) {
-    return min(x, y);
-}
+// 以下、Monoidの例
+template <class U = ll>
+struct RangeMax {
+    using T = U;
+    static T merge(T x, T y) { return max(x, y); }
+    static void update(T& target, T x) { target = x; }
+    static constexpr T identity() { return T(0); }
+};
 
-template <typename T>
-void SegmentTree<T>::updateNode(int k, T x) {
-    data[k] = x;
-}
+template <class U = ll>
+struct RangeSum {
+    using T = U;
+    static T merge(T x, T y) { return x + y; }
+    static void update(T& target, T x) { target += x; }
+    static constexpr T identity() { return T(0); }
+};
