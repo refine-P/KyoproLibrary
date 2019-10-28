@@ -5,17 +5,21 @@ struct SegmentTree {
     int n;
     vector<T> data;
 
-    SegmentTree(int size, T initial_value = Monoid::identity()) {
+    SegmentTree(int size, T initial_value = Monoid::identity) {
         n = 1;
         while (n < size) n *= 2;
-        data.resize(2 * n - 1, initial_value);
+        data.assign(2 * n - 1, initial_value);
+
+        if (initial_value != Monoid::identity) {
+            for (int i = n - 2; i >= 0; i--) data[i] = Monoid::merge(data[i * 2 + 1], data[i * 2 + 2]);
+        }
     }
 
-    SegmentTree(const vector<T>& v, T initial_value = Monoid::identity()) {
+    SegmentTree(const vector<T>& v) {
         int size = v.size();
         n = 1;
         while (n < size) n *= 2;
-        data.resize(2 * n - 1, initial_value);
+        data.resize(2 * n - 1);
 
         for (int i = 0; i < size; i++) data[i + n - 1] = v[i];
         for (int i = n - 2; i >= 0; i--) data[i] = Monoid::merge(data[i * 2 + 1], data[i * 2 + 2]);
@@ -38,7 +42,7 @@ struct SegmentTree {
     //k:節点番号, [l, r):節点に対応する区間
     T query(int a, int b, int k, int l, int r) {
         //[a, b)と[l, r)が交差しない場合
-        if (r <= a || b <= l) return Monoid::identity();
+        if (r <= a || b <= l) return Monoid::identity;
         //[a, b)が[l, r)を含む場合、節点の値
         if (a <= l && r <= b) return data[k];
         else {
@@ -57,7 +61,7 @@ struct SegmentTree {
     //非再帰版: バグってるかもしれないので定数倍高速化する時以外使わないで
     //区間[a, b)に対するクエリに答える
     T query_fast(int a, int b) {
-        T vl = Monoid::identity(), vr = Monoid::identity();
+        T vl = Monoid::identity, vr = Monoid::identity;
         for (int l = a + n, r = b + n; l != r; l >>= 1, r >>= 1) {
             if (l & 1) vl = Monoid::merge(vl, data[l++ - 1]);
             if (r & 1) vr = Monoid::merge(data[--r - 1], vr);
@@ -68,11 +72,11 @@ struct SegmentTree {
 
 // 以下、Monoidの例
 template <class U = ll>
-struct RangeMax {
+struct RangeMin {
     using T = U;
-    static T merge(T x, T y) { return max(x, y); }
+    static T merge(T x, T y) { return min(x, y); }
     static void update(T& target, T x) { target = x; }
-    static constexpr T identity() { return T(0); }
+    static constexpr T identity = numeric_limits<T>::max();
 };
 
 template <class U = ll>
@@ -80,5 +84,5 @@ struct RangeSum {
     using T = U;
     static T merge(T x, T y) { return x + y; }
     static void update(T& target, T x) { target += x; }
-    static constexpr T identity() { return T(0); }
+    static constexpr T identity = T(0);
 };
