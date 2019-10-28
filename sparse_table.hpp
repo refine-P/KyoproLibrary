@@ -6,6 +6,7 @@ struct SparseTable {
     vector< vector<T> > table;
     vector<int> log_table;
 
+    SparseTable() {}
     SparseTable(const vector<T>& v) {
         n = v.size();
 

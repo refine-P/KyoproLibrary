@@ -5,6 +5,8 @@ struct SegmentTree {
     int n;
     vector<T> data;
 
+    SegmentTree() {}
+    
     SegmentTree(int size, T initial_value = Monoid::identity) {
         n = 1;
         while (n < size) n *= 2;
