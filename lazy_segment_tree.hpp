@@ -1,123 +1,135 @@
-template <typename T>
+template <class MonoidOp>
 struct LazySegmentTree {
+    using Tm = typename MonoidOp::Tm;
+    using To = typename MonoidOp::To;
+
     int n;
-    vector<T> data;
-    vector<T> lazy;
-    T INITIAL_DATA_VALUE;
-    T INITIAL_LAZY_VALUE;
+    vector<Tm> data;
+    vector<To> lazy;
 
-    //使うときは、この3つを適宜変更する
-    static T merge(T x, T y);
-    void updateNode(int k, T x);
-    void apply(int k, int seg_len);
-
-    void init(int size, T initial_data_value, T initial_lazy_value) {
+    LazySegmentTree(int size, Tm initial_data_value = MonoidOp::unit()) {
         n = 1;
-        INITIAL_DATA_VALUE = initial_data_value;
-        INITIAL_LAZY_VALUE = initial_lazy_value;
-        while (n < size) n *= 2;
-        data.resize(2 * n - 1, INITIAL_DATA_VALUE);
-        lazy.resize(2 * n - 1, INITIAL_LAZY_VALUE);
+        while (n < size) n <<= 1;
+
+        data.assign(2 * n - 1, initial_data_value);
+        lazy.assign(2 * n - 1, MonoidOp::op_unit());
+
+        if (initial_data_value != MonoidOp::unit()) {
+            for (int i = n - 2; i >= 0; i--) data[i] = MonoidOp::merge(data[i * 2 + 1], data[i * 2 + 2]);
+        }
     }
 
-    void init(const vector<T>& v, T initial_data_value, T initial_lazy_value) {
+    LazySegmentTree(const vector<Tm>& v) {
         int size = v.size();
         n = 1;
-        INITIAL_DATA_VALUE = initial_data_value;
-        INITIAL_LAZY_VALUE = initial_lazy_value;
-        while (n < size) n *= 2;
-        data.resize(2 * n - 1, INITIAL_DATA_VALUE);
-        lazy.resize(2 * n - 1, INITIAL_LAZY_VALUE);
+        while (n < size) n <<= 1;
+        data.assign(2 * n - 1, MonoidOp::unit());
+        lazy.assign(2 * n - 1, MonoidOp::op_unit());
 
         for (int i = 0; i < size; i++) data[i + n - 1] = v[i];
-        for (int i = n - 2; i >= 0; i--) data[i] = merge(data[i * 2 + 1], data[i * 2 + 2]);
+        for (int i = n - 2; i >= 0; i--) data[i] = MonoidOp::merge(data[i * 2 + 1], data[i * 2 + 2]);
     }
 
-    LazySegmentTree(int size, T initial_data_value, T initial_lazy_value) {
-        init(size, initial_data_value, initial_lazy_value);
-    }
-
-    LazySegmentTree(int size, T initial_value) {
-        init(size, initial_value, initial_value);
-    }
-
-    LazySegmentTree(const vector<T>& v, T initial_data_value, T initial_lazy_value) {
-        init(v, initial_data_value, initial_lazy_value);
-    }
-
-    LazySegmentTree(const vector<T>& v, T initial_value) {
-        init(v, initial_value, initial_value);
-    }
-
-    T getLeaf(int k) {
-        return data[k + n - 1];
+    Tm getLeaf(int k) {
+        return query(k, k + 1);
     }
 
     void push(int k, int l, int r) {
-        if (lazy[k] == INITIAL_LAZY_VALUE) return;
-        apply(k, r - l);
+        if (lazy[k] == MonoidOp::op_unit()) return;
+        MonoidOp::apply(data[k], lazy[k], r - l);
         if (r - l > 1) {
-            updateNode(2 * k + 1, lazy[k]);
-            updateNode(2 * k + 2, lazy[k]);
+            MonoidOp::update(lazy[2 * k + 1], lazy[k]);
+            MonoidOp::update(lazy[2 * k + 2], lazy[k]);
         }
-        lazy[k] = INITIAL_LAZY_VALUE;
+        lazy[k] = MonoidOp::op_unit();
     }
 
     //区間[a, b)に対する更新
     //k:節点番号, [l, r):節点に対応する区間
-    void update(int a, int b, T x, int k, int l, int r) {
+    void update(int a, int b, To x, int k, int l, int r) {
         push(k, l, r);
         //[a, b)と[l, r)が交差しない場合
         if (r <= a || b <= l) return;
         //[a, b)が[l, r)を含む場合、節点の値
         if (a <= l && r <= b) {
-            updateNode(k, x);
+            MonoidOp::update(lazy[k], x);
             push(k, l, r);
         } else {
             update(a, b, x, k * 2 + 1, l, (l + r) / 2);
             update(a, b, x, k * 2 + 2, (l + r) / 2, r);
-            data[k] = merge(data[2 * k + 1], data[2 * k + 2]);
+            data[k] = MonoidOp::merge(data[2 * k + 1], data[2 * k + 2]);
         }
     }
 
-    void update(int a, int b, T x) {
+    void update(int a, int b, To x) {
         update(a, b, x, 0, 0, n);
     }
 
     //区間[a, b)に対するクエリに答える
     //k:節点番号, [l, r):節点に対応する区間
-    T query(int a, int b, int k, int l, int r) {
+    Tm query(int a, int b, int k, int l, int r) {
         push(k, l, r);
         //[a, b)と[l, r)が交差しない場合
-        if (r <= a || b <= l) return INITIAL_DATA_VALUE;
+        if (r <= a || b <= l) return MonoidOp::unit();
         //[a, b)が[l, r)を含む場合、節点の値
         if (a <= l && r <= b) return data[k];
         else {
             //二つの子をマージ
-            T vl = query(a, b, k * 2 + 1, l, (l + r) / 2);
-            T vr = query(a, b, k * 2 + 2, (l + r) / 2, r);
-            return merge(vl, vr);
+            Tm vl = query(a, b, k * 2 + 1, l, (l + r) / 2);
+            Tm vr = query(a, b, k * 2 + 2, (l + r) / 2, r);
+            return MonoidOp::merge(vl, vr);
         }
     }
 
     //外から呼ぶ用
-    T query(int a, int b) {
+    Tm query(int a, int b) {
         return query(a, b, 0, 0, n);
     }
 };
 
-//使うときは以下3つを変更
-template <typename T>
-T LazySegmentTree<T>::merge(T x, T y) {
-    return x + y;
-}
+// 以下、MonoidOpの例
+template<class U = ll, class V = U>
+struct RangeSumAdd {
+    using Tm = U;
+    using To = V;
+    static Tm merge(Tm x, Tm y) { return x + y; }
+    static void update(To& target, To x) { target += x; }
+    static void apply(Tm& target, To x, int seg_len) { target += x * seg_len; }
+    static constexpr Tm unit() { return Tm(0); }
+    static constexpr To op_unit() { return To(0); }
+};
 
-template <typename T>
-void LazySegmentTree<T>::updateNode(int k, T x) {
-    lazy[k] += x;
-}
+template<class U = ll, class V = U>
+struct RangeMinUpdate {
+    using Tm = U;
+    using To = V;
+    static Tm merge(Tm x, Tm y) { return min(x, y); }
+    static void update(To& target, To x) { target = x; }
+    static void apply(Tm& target, To x, int seg_len) { target = x; }
+    static constexpr Tm unit() { return numeric_limits<Tm>::max(); }
+    static constexpr To op_unit() { return numeric_limits<To>::max(); }
+};
 
-template <typename T>
-void LazySegmentTree<T>::apply(int k, int seg_len) {
-    data[k] += lazy[k] * seg_len;
-}
+// 作用素の初期値は更新クエリで与えられる値の定義域の範囲外の値にする
+template<class U = ll, class V = U>
+struct RangeSumUpdate {
+    using Tm = U;
+    using To = V;
+    static Tm merge(Tm x, Tm y) { return x + y; }
+    static void update(To& target, To x) { target = x; }
+    static void apply(Tm& target, To x, int seg_len) { target = x * seg_len; }
+    static constexpr Tm unit() { return Tm(0); }
+    static constexpr To op_unit() { return numeric_limits<To>::min(); }
+};
+
+// 初期値 != 単位元 の場合に注意
+template<class U = ll, class V = U>
+struct RangeMinAdd {
+    using Tm = U;
+    using To = V;
+    static Tm merge(Tm x, Tm y) { return min(x, y); }
+    static void update(To& target, To x) { target += x; }
+    static void apply(Tm& target, To x, int seg_len) { target += x; }
+    static constexpr Tm unit() { return numeric_limits<Tm>::max(); }
+    static constexpr To op_unit() { return To(0); }
+};
