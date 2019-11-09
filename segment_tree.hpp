@@ -9,7 +9,7 @@ struct SegmentTree {
     
     SegmentTree(int size, T initial_value = Monoid::unit()) {
         n = 1;
-        while (n < size) n *= 2;
+        while (n < size) n <<= 1;
         data.assign(2 * n - 1, initial_value);
 
         if (initial_value != Monoid::unit()) {
@@ -20,7 +20,7 @@ struct SegmentTree {
     SegmentTree(const vector<T>& v) {
         int size = v.size();
         n = 1;
-        while (n < size) n *= 2;
+        while (n < size) n <<= 1;
         data.assign(2 * n - 1, Monoid::unit());
 
         for (int i = 0; i < size; i++) data[i + n - 1] = v[i];
