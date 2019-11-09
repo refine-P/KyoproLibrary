@@ -99,6 +99,7 @@ struct RangeSumAdd {
     static constexpr To op_unit() { return To(0); }
 };
 
+// 作用素の単位元は更新クエリで与えられる値の定義域の範囲外の値にする
 template<class U = ll, class V = U>
 struct RangeMinUpdate {
     using Tm = U;
@@ -110,7 +111,7 @@ struct RangeMinUpdate {
     static constexpr To op_unit() { return numeric_limits<To>::max(); }
 };
 
-// 作用素の初期値は更新クエリで与えられる値の定義域の範囲外の値にする
+// 作用素の単位元は更新クエリで与えられる値の定義域の範囲外の値にする
 template<class U = ll, class V = U>
 struct RangeSumUpdate {
     using Tm = U;
