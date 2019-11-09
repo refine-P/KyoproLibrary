@@ -21,7 +21,7 @@ struct SegmentTree {
         int size = v.size();
         n = 1;
         while (n < size) n *= 2;
-        data.resize(2 * n - 1);
+        data.assign(2 * n - 1, Monoid::unit());
 
         for (int i = 0; i < size; i++) data[i + n - 1] = v[i];
         for (int i = n - 2; i >= 0; i--) data[i] = Monoid::merge(data[i * 2 + 1], data[i * 2 + 2]);
