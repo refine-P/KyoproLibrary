@@ -7,9 +7,7 @@ struct SparseTable {
     vector<int> log_table;
 
     SparseTable() {}
-    SparseTable(const vector<T>& v) {
-        n = v.size();
-
+    SparseTable(const vector<T>& v) : n(v.size()) {
         log_table.resize(n + 1, 0);
         for (int i = 2; i <= n; i++) {
             log_table[i] = log_table[i >> 1] + 1;
@@ -30,7 +28,7 @@ struct SparseTable {
 
     //区間[l, r)に対するクエリに答える
     T query(int l, int r) {
-        assert(l < r); 
+        assert(l < r && r <= n);
         int k = log_table[r - l];
         return SemiLattice::merge(table[k][l], table[k][r - (1 << k)]);
     }
@@ -40,5 +38,5 @@ struct SparseTable {
 template <class U = ll>
 struct RMQSL {
     using T = U;
-    static T merge(T a, T b) { return max(a, b); }
+    static T merge(T a, T b) { return min(a, b); }
 };
