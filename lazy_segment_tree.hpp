@@ -7,6 +7,8 @@ struct LazySegmentTree {
     vector<Tm> data;
     vector<To> lazy;
 
+    LazySegmentTree() {}
+
     LazySegmentTree(int size, Tm initial_data_value = MonoidOp::unit()) {
         n = 1;
         while (n < size) n <<= 1;
