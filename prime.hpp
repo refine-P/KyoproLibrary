@@ -1,14 +1,17 @@
-bool is_prime(int n) {
+template<typename T>
+bool is_prime(T n) {
+    if (n == 2) return true;
 	if (n % 2 == 0) return false;
-	for (int i = 2; i * i <= n; i++) {
+	for (T i = 3; i * i <= n; i += 2) {
 		if (n % i == 0) return false;
 	}
 	return n != 1;
 }
 
-vector<int> divisor(int n) {
-	vector<int> res;
-	for (int i = 1; i * i <= n; i++) {
+template<typename T>
+vector<T> divisor(T n) {
+	vector<T> res;
+	for (T i = 1; i * i <= n; i++) {
 		if (n % i == 0) {
 			res.emplace_back(i);
 			if (i != n / i) res.emplace_back(n / i);
@@ -17,9 +20,10 @@ vector<int> divisor(int n) {
 	return res;
 }
 
-map<int, int> prime_factor(int n) {
-	map<int, int> res;
-	for (int i = 2; i * i <= n; i++) {
+template<typename T>
+map<T, int> prime_factor(T n) {
+	map<T, int> res;
+	for (T i = 2; i * i <= n; i++) {
 		while (n % i == 0) {
 			++res[i];
 			n /= i;
@@ -29,15 +33,16 @@ map<int, int> prime_factor(int n) {
 	return res;
 }
 
-vector<int> sieve(int n) {
-	vector<int> res;
+template<typename T>
+vector<T> sieve(T n) {
+	vector<T> res;
 	vector<bool> is_prime(n + 1, true);
 	is_prime[0] = false;
 	is_prime[1] = false;
-	for (int i = 2; i <= n; i++) {
+	for (T i = 2; i <= n; i++) {
 		if (!is_prime[i]) continue;
 		res.emplace_back(i);
-		for (int j = 2 * i; j <= n; j += i) is_prime[j] = false;
+		for (T j = 2 * i; j <= n; j += i) is_prime[j] = false;
 	}
 	return res;
 }
