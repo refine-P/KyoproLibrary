@@ -20,6 +20,8 @@ if __name__ == "__main__":
 
 	print(r"\documentclass{jsarticle}")
 	print(r"\usepackage{listings, jlisting}")
+	print(r"\usepackage[top=5truemm,bottom=15truemm,left=5truemm,right=5truemm]{geometry}")
+	print(r"\renewcommand{\thesection}{[\arabic{section}]}")
 
 	setting = r"""\lstset{% 
 	language={C++},%
