@@ -1,12 +1,9 @@
-template<const int CHAR_NUM = 26, const char FIRST_CHAR = 'a'>
+template<const int CHAR_NUM = 26, const char FIRST_CHAR = 'a', const int NONE = -1>
 struct Trie {
-    static const int NONE;
-
     struct Node {
-        bool leaf;
-        int idxs[CHAR_NUM];
-        Node() {
-            leaf = false;
+        bool word_exists;
+        int idxs[CHAR_NUM]; // idxs[c - FIRST_CHAR]: 次の文字がcであるNodeの場所(treeのindex)
+        Node() : word_exists(false) {
             fill(idxs, idxs + CHAR_NUM, NONE);
         };
     };
@@ -26,7 +23,7 @@ struct Trie {
             }
             cur = tree[cur].idxs[c - FIRST_CHAR];
         }
-        tree[cur].leaf = true;
+        tree[cur].word_exists = true;
     }
 
     bool find(const string& s) {
@@ -37,22 +34,6 @@ struct Trie {
             }
             cur = tree[cur].idxs[c - FIRST_CHAR];
         }
-        return tree[cur].leaf;
-    }
-
-    int dfs(int cur, int K) {
-        int res = K + 1;
-        for (int i = 0; i < CHAR_NUM; i++) {
-            if (tree[cur].idxs[i] == NONE) continue;
-            int hoge = dfs(tree[cur].idxs[i], K);
-            if (hoge >= K) continue;
-            res = min(res, hoge + 1);
-        }
-        if (res > K) res = 0;
-        return res;
+        return tree[cur].word_exists;
     }
 };
-
-// 定数の定義はこう書かないとなぜかエラーが出る
-template<const int CHAR_NUM, const char FIRST_CHAR>
-const int Trie<CHAR_NUM, FIRST_CHAR>::NONE = -1;
