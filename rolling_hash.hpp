@@ -1,50 +1,26 @@
-typedef unsigned long long ull;
+using ull = unsigned long long;
 
-const ull B = 100000007; //ハッシュの基数
+template<ull mod = 1000000007>
+struct RollingHash {
+	vector<ull> hashs, power;
 
-//bの中にaが存在する？
-bool containSubString(string a, string b) {
-    int al = a.length(), bl = b.length();
-    if (al > bl) return false;
-    
-    //Bのal乗を計算
-    ull t = 1;
-    for (int i = 0; i < al; i++) t *= B;
-    
-    //aとbの最初のal文字に関するハッシュ値を計算
-    ull ah = 0, bh = 0;
-    for (int i = 0; i < al; i++) ah = ah * B + a[i];
-    for (int i = 0; i < al; i++) bh = bh * B + b[i];
-    
-    //bの場所を一つずつ進めながらハッシュ値をチェック
-    for (int i = 0; i + al <= bl; i++) {
-        if (ah == bh) return true; //bのi文字目からのal文字が一致
-        if (i + al < bl) bh = bh * B + b[i + al] - t * b[i];
-    }
-    
-    return false;
-}
+	RollingHash() {}
+	RollingHash(const string& s, ull base = 10007) {
+		int sz = s.size();
+		hashs.assign(sz + 1, 0);
+		power.assign(sz + 1, 0);
+		power[0] = 1;
 
-//bの中にaは何個ある？
-int countSubString(string a, string b) {
-    int al = a.length(), bl = b.length();
-    if (al > bl) return 0;
-    
-    //Bのal乗を計算
-    ull t = 1;
-    for (int i = 0; i < al; i++) t *= B;
-    
-    //aとbの最初のal文字に関するハッシュ値を計算
-    ull ah = 0, bh = 0;
-    for (int i = 0; i < al; i++) ah = ah * B + a[i];
-    for (int i = 0; i < al; i++) bh = bh * B + b[i];
-    
-    int ret = 0;
-    //bの場所を一つずつ進めながらハッシュ値をチェック
-    for (int i = 0; i + al <= bl; i++) {
-        if (ah == bh) ret++; //bのi文字目からのal文字が一致
-        if (i + al < bl) bh = bh * B + b[i + al] - t * b[i];
-    }
-    
-    return ret;
-}
+		for (int i = 0; i < sz; i++) {
+			power[i + 1] = power[i] * base % mod;
+			hashs[i + 1] = (hashs[i] * base) % mod + s[i];
+			if (hashs[i + 1] >= mod) hashs[i] -= mod;
+		}
+	}
+
+	ull get(int l, int r) const {
+		ull res = hashs[r] + mod - hashs[l] * power[r - l] % mod;
+		if (res >= mod) res -= mod;
+		return res;
+	}
+};
