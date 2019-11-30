@@ -46,7 +46,8 @@ if __name__ == "__main__":
 
 	lib_list = os.listdir(path=dir_name)
 	for file_name in lib_list:
-		if file_name[-3:] not in {'hpp', 'cpp'}:
+		ext = os.path.splitext(file_name)[1]
+		if ext not in {'.hpp', '.cpp', '.snippet'}:
 			continue
 		snippet = generate_snippet(dir_name, file_name)
 		snippet_dict[snippet['prefix']] = snippet
