@@ -33,7 +33,7 @@ private:
 
     T dfs(int v, int t, T f) {
         if (v == t) return f;
-        for (int& i = iter[v]; i < G[v].size(); i++) {
+        for (int& i = iter[v]; i < G[v].size(); ++i) {
             Edge& e = G[v][i];
             if (e.cap > 0 && level[v] < level[e.to]) {
                 T d = dfs(e.to, t, min(f, e.cap));
@@ -51,8 +51,8 @@ public:
     Dinic(int V) : G(V), level(V, -1), iter(V, 0) {}
 
     void add_edge(int from, int to, T cap) {
-        G[from].push_back(Edge(to, cap, G[to].size()));
-        G[to].push_back(Edge(from, 0, G[from].size() - 1));
+        G[from].emplace_back(to, cap, G[to].size());
+        G[to].emplace_back(from, 0, G[from].size() - 1);
     }
 
     T max_flow(int s, int t) {
