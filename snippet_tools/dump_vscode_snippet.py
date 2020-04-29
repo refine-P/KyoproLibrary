@@ -1,56 +1,61 @@
-#coding: utf-8
+# coding: utf-8
 
-import sys
-import os
 import json
+import os
+import pathlib
+import sys
 
-def generate_snippet(dir_name, file_name):
-	root_name = os.path.splitext(file_name)[0]
-	full_path = os.path.abspath(os.path.join(dir_name, file_name))
+EXTENSION = {'.hpp', '.cpp', '.snippet'}
+HEADER = """/*
+// Place your snippets for C++ here. Each snippet is defined under a snippet name and has a prefix, body and 
+// description. The prefix is what is used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. Placeholders with the 
+// same ids are connected.
+// Example:
+"Print to console": {
+	"prefix": "log",
+	"body": [
+		"console.log('$1');",
+		"$2"
+	],
+	"description": "Log output to console"
+}
+*/"""
 
-	with open(full_path, encoding='utf-8') as f:
+def generate_snippet(lib_file):
+	with lib_file.open(encoding='utf-8') as f:
 		body = [s.rstrip() for s in f]
 	
 	snippet = {}
 
-	snippet['prefix'] = root_name
+	snippet['prefix'] = lib_file.stem
 	snippet['body'] = body
-	snippet['description'] = root_name
+	snippet['description'] = lib_file.stem
 
 	return snippet
 
+def main():
+	snippet_file = os.getenv("CPPSNIPPET")
+	if not snippet_file:
+		print("Please set CPPSNIPPET.")
+		sys.exit(1)
+	snippet_file = pathlib.Path(snippet_file)
+
+	lib_dir = pathlib.Path(__file__).resolve().parents[1]
+
+	snippet_dict = {}
+	for lib_file in lib_dir.glob("**/*.*"):
+		if lib_file.is_file() and lib_file.suffix in EXTENSION:
+			snippet = generate_snippet(lib_file)
+			snippet_dict[snippet['prefix']] = snippet
+	snippet_json = json.dumps(snippet_dict, ensure_ascii=False, indent=4)
+
+	with snippet_file.open("w", encoding="utf-8") as f:
+		f.write(HEADER)
+		f.write("\n\n")
+		f.write(snippet_json)
+		f.write("\n")
+
 
 if __name__ == "__main__":
-
-	header = """/*
-	// Place your snippets for C++ here. Each snippet is defined under a snippet name and has a prefix, body and 
-	// description. The prefix is what is used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
-	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. Placeholders with the 
-	// same ids are connected.
-	// Example:
-	"Print to console": {
-		"prefix": "log",
-		"body": [
-			"console.log('$1');",
-			"$2"
-		],
-		"description": "Log output to console"
-	}
-*/"""
-
-	print(header)
-	print()
-
-	dir_name = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-	snippet_dict = {}
-
-	lib_list = os.listdir(path=dir_name)
-	for file_name in lib_list:
-		ext = os.path.splitext(file_name)[1]
-		if ext not in {'.hpp', '.cpp', '.snippet'}:
-			continue
-		snippet = generate_snippet(dir_name, file_name)
-		snippet_dict[snippet['prefix']] = snippet
-
-	snippet_json = json.dumps(snippet_dict, ensure_ascii=False, indent=4)
-	print(snippet_json)
+	main()
