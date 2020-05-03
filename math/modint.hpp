@@ -47,7 +47,7 @@ struct ModInt {
 
     constexpr ModInt& operator+=(const ModInt& rhs) noexcept {
         val += rhs.val;
-        if (val >= Modulus) val -= MOD;
+        if (val >= MOD) val -= MOD;
         return *this;
     }
     constexpr ModInt& operator-=(const ModInt& rhs) noexcept {
