@@ -1,5 +1,5 @@
 // https://noshi91.hatenablog.com/entry/2019/03/31/174006
-template <std::uint_fast64_t Modulus> 
+template <std::uint_fast64_t Modulus>
 struct ModInt {
     using u64 = std::uint_fast64_t;
 
@@ -16,15 +16,18 @@ struct ModInt {
         return res;
     }
 
+    constexpr bool operator==(const ModInt& rhs) const noexcept { return val == rhs.val; }
+    constexpr bool operator!=(const ModInt& rhs) const noexcept { return val != rhs.val; }
+
     // prefix increment/decrement
     constexpr ModInt& operator++() noexcept { return *this += ModInt(1); }
     constexpr ModInt& operator--() noexcept { return *this -= ModInt(1); }
-    
+
     // postfix increment/decrement
     constexpr ModInt& operator++(int) noexcept {
         ModInt tmp(*this);
         ++*this;
-        return tmp; 
+        return tmp;
     }
     constexpr ModInt& operator--(int) noexcept {
         ModInt tmp(*this);
