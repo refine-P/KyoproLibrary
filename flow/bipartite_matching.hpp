@@ -1,36 +1,38 @@
-const int MAX_V = 100;
+class BipartiteMatching {
+public:
+    using Graph = vector< vector<int> >;
 
-int V;
-vector<int> G[MAX_V];
-int match[MAX_V];
-bool used[MAX_V];
+private:
+    bool dfs(int v, vector<int>& used) {
+        used[v] = true;
+        for (int u : g[v]) {
+            int w = match[u];
+            if (w < 0 || !used[w] && dfs(w, used)) {
+                match[v] = u;
+                match[u] = v;
+                return true;
+            }
+        }
+        return false;
+    }
 
-void add_edge(int u, int v) {
-	G[u].push_back(v);
-	G[v].push_back(u);
-}
+public:
+    const Graph& g;
+    vector<int> match;
 
-bool dfs(int v) {
-	used[v] = true;
-	for (int i = 0; i < G[v].size(); i++) {
-		int u = G[v][i], w = match[u];
-		if (w < 0 || !used[w] && dfs(w)) {
-			match[v] = u;
-			match[u] = v;
-			return true;
-		}
-	}
-	return false;
-}
+    BipartiteMatching(const Graph& bi_graph) : g(bi_graph) {}
 
-int bipartite_matching() {
-	int res = 0;
-	memset(match, -1, sizeof(match));
-	for (int v = 0; v < V; v++) {
-		if (match[v] < 0) {
-			memset(used, 0, sizeof(used));
-			if (dfs(v)) res++;
-		}
-	}
-	return res;
-}
+    int operator()() {
+        int n = g.size();
+        match.assign(n, -1);
+
+        int res = 0;
+        for (int v = 0; v < n; v++) {
+            if (match[v] < 0) {
+                vector<int> used(n, false);
+                if (dfs(v, used)) res++;
+            }
+        }
+        return res;
+    }
+};
