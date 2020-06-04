@@ -24,12 +24,12 @@ struct ModInt {
     constexpr ModInt& operator--() noexcept { return *this -= ModInt(1); }
 
     // postfix increment/decrement
-    constexpr ModInt& operator++(int) noexcept {
+    constexpr ModInt operator++(int) noexcept {
         ModInt tmp(*this);
         ++*this;
         return tmp;
     }
-    constexpr ModInt& operator--(int) noexcept {
+    constexpr ModInt operator--(int) noexcept {
         ModInt tmp(*this);
         --*this;
         return tmp;
