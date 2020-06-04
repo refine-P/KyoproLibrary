@@ -9,6 +9,7 @@ struct Nothing {
     static constexpr To op_unit() { return To(0); }
 };
 
+// [Related]: monoid_op
 // https://www.slideshare.net/iwiwi/2-12188757
 // https://tubo28.me/compprog/algorithm/treap/
 // https://ei1333.github.io/luzhiled/snippets/structure/rbst.html

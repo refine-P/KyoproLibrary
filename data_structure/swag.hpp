@@ -1,3 +1,4 @@
+// [Related]: semigroup
 // https://scrapbox.io/data-structures/Sliding_Window_Aggregation
 template<class SemiGroup>
 struct SWAG {
@@ -51,11 +52,4 @@ struct SWAG {
         }
         front_stack.pop();
     }
-};
-
-// 以下、SemiGroupの例
-template <class U = ll>
-struct RMQSG {
-    using T = U;
-    static T merge(T a, T b) { return min(a, b); }
 };

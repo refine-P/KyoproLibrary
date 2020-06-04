@@ -1,3 +1,4 @@
+// [Related]: monoid
 template <class Monoid>
 struct SegmentTree {
     using T = typename Monoid::T;
@@ -70,21 +71,4 @@ struct SegmentTree {
         }
         return Monoid::merge(vl, vr);
     }
-};
-
-// 以下、Monoidの例
-template <class U = ll>
-struct RangeMin {
-    using T = U;
-    static T merge(T x, T y) { return min(x, y); }
-    static void update(T& target, T x) { target = x; }
-    static constexpr T unit() { return numeric_limits<T>::max(); }
-};
-
-template <class U = ll>
-struct RangeSum {
-    using T = U;
-    static T merge(T x, T y) { return x + y; }
-    static void update(T& target, T x) { target += x; }
-    static constexpr T unit() { return T(0); }
 };

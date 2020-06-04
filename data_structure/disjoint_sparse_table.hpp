@@ -1,3 +1,4 @@
+// [Related]: semigroup
 template <class SemiGroup>
 struct DisjointSparseTable {
     using T = typename SemiGroup::T;
@@ -35,11 +36,4 @@ struct DisjointSparseTable {
         int msb = 31 - __builtin_clz(l ^ r);
         return SemiGroup::merge(table[msb][l], table[msb][r]);
     }
-};
-
-//以下、SemiGroupの例
-template <class U = ll>
-struct RSQSG {
-    using T = U;
-    static T merge(T a, T b) { return a + b; }
 };

@@ -1,3 +1,4 @@
+// [Related]: monoid_op
 template <class MonoidOp>
 struct LazySegmentTree {
     using Tm = typename MonoidOp::Tm;
@@ -87,52 +88,4 @@ struct LazySegmentTree {
     Tm query(int a, int b) {
         return query(a, b, 0, 0, n);
     }
-};
-
-// 以下、MonoidOpの例
-template<class U = ll, class V = U>
-struct RangeSumAdd {
-    using Tm = U;
-    using To = V;
-    static Tm merge(Tm x, Tm y) { return x + y; }
-    static void update(To& target, To x) { target += x; }
-    static void apply(Tm& target, To x, int seg_len) { target += x * seg_len; }
-    static constexpr Tm unit() { return Tm(0); }
-    static constexpr To op_unit() { return To(0); }
-};
-
-// 作用素の単位元は更新クエリで与えられる値の定義域の範囲外の値にする
-template<class U = ll, class V = U>
-struct RangeMinUpdate {
-    using Tm = U;
-    using To = V;
-    static Tm merge(Tm x, Tm y) { return min(x, y); }
-    static void update(To& target, To x) { target = x; }
-    static void apply(Tm& target, To x, int seg_len) { target = x; }
-    static constexpr Tm unit() { return numeric_limits<Tm>::max(); }
-    static constexpr To op_unit() { return numeric_limits<To>::max(); }
-};
-
-// 作用素の単位元は更新クエリで与えられる値の定義域の範囲外の値にする
-template<class U = ll, class V = U>
-struct RangeSumUpdate {
-    using Tm = U;
-    using To = V;
-    static Tm merge(Tm x, Tm y) { return x + y; }
-    static void update(To& target, To x) { target = x; }
-    static void apply(Tm& target, To x, int seg_len) { target = x * seg_len; }
-    static constexpr Tm unit() { return Tm(0); }
-    static constexpr To op_unit() { return numeric_limits<To>::min(); }
-};
-
-// 初期値 != 単位元 の場合に注意
-template<class U = ll, class V = U>
-struct RangeMinAdd {
-    using Tm = U;
-    using To = V;
-    static Tm merge(Tm x, Tm y) { return min(x, y); }
-    static void update(To& target, To x) { target += x; }
-    static void apply(Tm& target, To x, int seg_len) { target += x; }
-    static constexpr Tm unit() { return numeric_limits<Tm>::max(); }
-    static constexpr To op_unit() { return To(0); }
 };

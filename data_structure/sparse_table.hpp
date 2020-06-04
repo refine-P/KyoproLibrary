@@ -1,3 +1,4 @@
+// [Related]: semilattice
 template <class SemiLattice>
 struct SparseTable {
     using T = typename SemiLattice::T;
@@ -32,11 +33,4 @@ struct SparseTable {
         int k = log_table[r - l];
         return SemiLattice::merge(table[k][l], table[k][r - (1 << k)]);
     }
-};
-
-//以下、SemiLatticeの例
-template <class U = ll>
-struct RMQSL {
-    using T = U;
-    static T merge(T a, T b) { return min(a, b); }
 };
