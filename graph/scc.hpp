@@ -1,43 +1,45 @@
-const int MAX_V = 300;
+class StronglyConnectedComponents {
+private:
+    void dfs(int v, vector<int>& used) {
+        used[v] = true;
+        for (int i = 0; i < G[v].size(); i++) {
+            if (!used[G[v][i]]) dfs(G[v][i], used);
+        }
+        vs.push_back(v);
+    }
 
-int V;
-vector<int> G[MAX_V];
-vector<int> rG[MAX_V];
-vector<int> vs;
-bool used[MAX_V];
-int cmp[MAX_V];
+    void rdfs(int v, int k, vector<int>& used) {
+        used[v] = true;
+        cmp[v] = k;
+        for (int i = 0; i < rG[v].size(); i++) {
+            if (!used[rG[v][i]]) rdfs(rG[v][i], k, used);
+        }
+    }
 
-void add_edge(int from, int to) {
-	G[from].push_back(to);
-	rG[to].push_back(from);
-}
+public:
+    int V;
+    vector< vector<int> > G, rG;
+    vector<int> vs;
+    vector<int> cmp;
 
-void dfs(int v) {
-	used[v] = true;
-	for (int i = 0; i < G[v].size(); i++) {
-		if (!used[G[v][i]]) dfs(G[v][i]);
-	}
-	vs.push_back(v);
-}
+    StronglyConnectedComponents(int n) : V(n), G(n), rG(n), cmp(n, -1) {}
 
-void rdfs(int v, int k) {
-	used[v] = true;
-	cmp[v] = k;
-	for (int i = 0; i < rG[v].size(); i++) {
-		if (!used[rG[v][i]]) rdfs(rG[v][i], k);
-	}
-}
+    void add_edge(int from, int to) {
+        G[from].push_back(to);
+        rG[to].push_back(from);
+    }
 
-int scc() {
-	memset(used, 0, sizeof(used));
-	vs.clear();
-	for (int v = 0; v < V; v++) {
-		if (!used[v]) dfs(v);
-	}
-	memset(used, 0, sizeof(used));
-	int k = 0;
-	for (int i = (int)vs.size() - 1; i >= 0; i--) {
-		if (!used[vs[i]]) rdfs(vs[i], k++);
-	}
-	return k;
-}
+    int run() {
+        vector<int> used(V, false);
+        vs.clear();
+        for (int v = 0; v < V; v++) {
+            if (!used[v]) dfs(v, used);
+        }
+        used.assign(V, false);
+        int k = 0;
+        for (int i = (int)vs.size() - 1; i >= 0; i--) {
+            if (!used[vs[i]]) rdfs(vs[i], k++, used);
+        }
+        return k;
+    }
+};
