@@ -20,6 +20,11 @@ struct Comb {
         if (n < k || n < 0 || k < 0) return 0;
         return fact[n] * fact_inv[k] * fact_inv[n - k];
     }
+
+    constexpr T perm(int n, int k) const noexcept {
+        if (n < k || n < 0 || k < 0) return 0;
+        return fact[n] * fact_inv[n - k];        
+    }
 };
 
 const Comb<200000> comb;
