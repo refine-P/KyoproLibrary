@@ -1,4 +1,4 @@
-constexpr double ticks_per_sec = 2800000000;
+constexpr double ticks_per_sec = 2800000000; // AtCoder: 3000000000;
 constexpr double ticks_per_sec_inv = 1.0 / ticks_per_sec;
 inline double rdtsc() { // in seconds
     uint32_t lo, hi;
