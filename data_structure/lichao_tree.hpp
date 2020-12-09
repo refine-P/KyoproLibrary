@@ -1,4 +1,4 @@
-// https://lumakernel.github.io/ecasdqina/dynamic-programming/convex-hull-trick/LiChaoTree
+// 参照: https://github.com/LumaKernel/lib-cpp/blob/master/src/dynamic-programming/convex-hull-trick/LiChaoTree.cpp
 // 最小化: Comp = less<T>, 最大化: Comp = greater<T> 
 template<class T = ll, class Comp = less<T> >
 struct LiChaoTree {
